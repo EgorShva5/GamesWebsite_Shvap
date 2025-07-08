@@ -1,0 +1,3 @@
+db:
+  secret: "password goes here"
+# secret must be at least 6 characters long...

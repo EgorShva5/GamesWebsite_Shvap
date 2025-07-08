@@ -1,0 +1,203 @@
+body {
+    padding: 0;
+    margin: 0; 
+    background-color: #872341;
+}
+
+header {
+    position: relative;
+    background-color: #22092C;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100%;
+    height: 50px;
+}
+
+header * {
+    display: inline-flex;
+}
+
+h1,h2,h3,p,a,h4,h5,h6 {
+    font-family: Jost;
+    color: aliceblue;
+}
+
+.HeaderBtn {
+    transition: all .2s;
+    color: aliceblue;
+    font-size: 20px;
+
+}
+
+.HeaderBtn:hover{
+    color:#ff6c61;
+    filter: drop-shadow(#ff6c61 0px 0px 5px)
+}
+
+.header_content, .footer_content {
+    width: 60%;
+    color: aliceblue;
+    display: flex;
+    justify-content:  space-around;
+    align-items: center;
+}
+
+.header_content * {
+    font-size: 25px;
+}
+
+.big_artilce {
+    font-size: 50px;
+}
+
+footer {
+    position: relative;
+    text-align: center;
+    background-color: #22092C;
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+}
+
+.h_container {
+    /*background-color: blue;*/
+    display: flex;
+    flex-direction: row;
+}
+
+.h_container.GamesContainer {
+    flex-wrap: wrap;
+    max-width: 1000px;
+    justify-content: space-around;
+}
+
+.h_container.Margin * {
+    margin-right: 10px;
+}
+
+.h_container.Margin.StickyPos {
+    position: sticky;
+    left:40px;
+    top: 20px;
+    display:flex; 
+    align-items: center; 
+    justify-content: center; 
+    box-shadow: #872341 0px 0px 20px; 
+    z-index: 1000; 
+    background-color: #872341;
+    flex-wrap: wrap;
+}
+
+.ElementsCenter {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.ElementsCenter.FirstRazdel {
+    background-image: linear-gradient(to bottom, #22092C 40%, #872341);
+}
+
+.ElementsCenter.LastRazdel {
+    background-image: linear-gradient(to top, #22092C 40%, #872341);   
+}
+
+.TextDiv{
+    text-align: center;
+    max-width: 900px;
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    font-size: 25px;
+}
+
+.Game p {
+    font-size: 15px;
+}
+
+@media (max-width: 600px) {
+    .h_container.Margin.StickyPos {
+        max-width: 500px;
+        font-size: 10px;
+    }
+
+    .header_content *{
+        font-size: 15px;
+    }
+
+    .big_artilce {
+        font-size: 35px;
+    }
+
+    .TextDiv {
+        max-width: 350px;
+    }
+
+    .Game {
+        max-height: 330px;
+    }
+
+    .Game h1 {
+        font-size: 20px;
+    }
+
+    .Game p {
+        font-size: 15px;
+    }
+
+    footer {
+        font-size: 13px;
+    }
+  }
+
+.Game {
+    text-align: center;
+    margin: 30px;
+    padding-top: 10px;
+    box-shadow: black 0px 0px 10px;
+    transition: all.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 240px;
+    height: auto;
+    background: linear-gradient(to bottom, /*#1f1f1f*/ #872341 40%,#22092C);
+    filter: saturate(0.7);
+    background-position: 200px;
+    background-size: 150%;
+    border: 3px solid rgb(12, 12, 12);
+}
+
+.Game:hover{
+    box-shadow: black 0px 0px 30px;
+    background-position: 0px;
+    scale: 1.1;
+    border-radius: 20px;
+    filter: saturate(1);
+}
+
+.Game *{
+    margin: 5px;
+}
+
+.Game a{
+    color: rgb(19, 19, 19);
+}
+
+.Game img {
+    box-shadow: black 0px 0px 10px;
+    width: 170px;
+    height: 170px;
+}
