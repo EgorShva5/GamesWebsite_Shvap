@@ -21,6 +21,9 @@ func main() {
 
 	r.GET("/", handler.RedirectHome)
 	r.GET("home", handler.LoadHome)
+	r.GET("auth", handler.LoadAuth)
+
+	r.POST("auth", handler.Register(db))
 
 	r.Run(":3000")
 }

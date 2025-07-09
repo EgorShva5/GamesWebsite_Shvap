@@ -25,8 +25,8 @@ type Config struct {
 
 // Check if the password is too short.
 func (cfg *Config) validate() error {
-	if tmp := len(cfg.DB.Secret); tmp < 6 {
-		return fmt.Errorf("secret length should be at least 6 characters (got %v) hint: change it in config/config.yaml", tmp)
+	if tmp := len(cfg.DB.Secret); tmp < 6 || tmp > 128 {
+		return fmt.Errorf("secret length should be 6-128 characters (got %v) hint: change it in config/config.yaml", tmp)
 	}
 	return nil
 }
