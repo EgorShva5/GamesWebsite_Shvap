@@ -105,3 +105,20 @@ func (db *Database) Register(login string, password string) error {
 
 	return nil
 }
+
+// Check user password. Error if user does not exist.
+func (db *Database) CheckPassword(login string, password string) error {
+	var storedHash []byte
+	password += config.DB.Secret
+
+	err := db.DB.QueryRow("SELECT password FROM users WHERE login = ?", login).Scan(&storedHash)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve password from db")
+	}
+
+	err = bcrypt.CompareHashAndPassword(storedHash, []byte(password))
+	if err != nil {
+		return fmt.Errorf("failed to compare passwords")
+	}
+	return nil
+}

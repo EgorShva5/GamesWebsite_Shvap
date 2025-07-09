@@ -23,7 +23,8 @@ func main() {
 	r.GET("home", handler.LoadHome)
 	r.GET("auth", handler.LoadAuth)
 
-	r.POST("auth", handler.Register(db))
+	r.POST("api/register", handler.Register(db))
+	r.POST("api/login", handler.Login(db))
 
 	r.Run(":3000")
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type RegisterRequest struct {
+type AuthRequest struct {
 	Login    string `json:"login" binding:"required,min=3,max=32"`
 	Password string `json:"password" binding:"required,min=6,max=128"`
 }
@@ -30,7 +30,7 @@ func LoadAuth(ctx *gin.Context) {
 // Check if user input is valid and register a new account.
 func Register(db *store.Database) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req RegisterRequest
+		var req AuthRequest
 
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -49,5 +49,23 @@ func Register(db *store.Database) gin.HandlerFunc {
 
 		ctx.JSON(http.StatusCreated, gin.H{})
 	}
+}
 
+// Check password and authorize user, store JWT-token as a cookie (WIP)
+func Login(db *store.Database) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req AuthRequest
+
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if r := db.CheckPassword(req.Login, req.Password); r != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to login"})
+			return
+		}
+
+		ctx.JSON(http.StatusAccepted, gin.H{})
+	}
 }
