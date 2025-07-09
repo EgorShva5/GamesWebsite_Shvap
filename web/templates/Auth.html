@@ -6,6 +6,7 @@
     </head>
 
     <body>
+        <div class='v_div'>
         <header>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <div class = 'header_content'>
@@ -20,27 +21,52 @@
             </div>
         </header>
         
-        <main style="height: 1000px;">
+        <main class = 'ElementsCenter'>
             <form id="registerForm" method="post">
+                <div class='v_div2'>
                 <input type="text" name="login" placeholder="Логин" size="45px" minlength="4" maxlength="32" required>
                 <input type="password" id="password" placeholder="Пароль" size="45px" minlength="6" maxlength="128" required>
                 <button type="submit" value="Submit" size="30px" value="Register">
+                </div>
             </form>
-            <br>
 
-        </main>
-            <form id="loginForm" method="post">
+            <form style = 'display:none' id="loginForm" method="post">
+                <div class='v_div2'>
                 <input type="text" name="login" placeholder="Логин" size="45px" minlength="4" maxlength="32" required>
                 <input type="password" id="password" placeholder="Пароль" size="45px" minlength="6" maxlength="128" required>
                 <button type="submit" value="Submit" size="30px" value="Login">
+                </div>
             </form>
+
+            <input type='button' id='ch_btn' value='Вход'> 
+
+            
+        </main>
+
 
         <footer>
             <h1>© 2022-2025 Shvap. All rights reserved.</h1>
         </footer>
+        </div>
     </body>
 
     <script>
+        let LoginForm = document.getElementById('registerForm')
+        let EnterForm = document.getElementById('loginForm')
+        let ChBtn = document.getElementById('ch_btn')
+
+        ChBtn.addEventListener('click', function () {
+            if (ChBtn.value == 'Вход') {
+                LoginForm.style.display = 'none';
+                EnterForm.style.display = 'block';
+                ChBtn.value = 'Регистрация';
+            } else if (ChBtn.value == 'Регистрация') {
+                LoginForm.style.display = 'block';
+                EnterForm.style.display = 'none'; 
+                ChBtn.value = 'Вход';
+            }
+        })
+
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -90,7 +116,7 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert('Авторизация успешна!');
+                    window.location.href = '/home'
                 } else {
                     alert(`Ошибка: ${result.error}`);
                 }

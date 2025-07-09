@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/yaml.v3"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 // Struct for db and db-related methods.
@@ -52,7 +52,7 @@ func Init() (*Database, error) {
 		return nil, err
 	}
 
-	db, err := sql.Open("sqlite3", "./data/db")
+	db, err := sql.Open("sqlite", "./data/db")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
