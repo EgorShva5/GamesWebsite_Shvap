@@ -1,3 +1,5 @@
-db:
-  secret: "password goes here"
-# secret must be at least 6 characters long...
+keys:
+  passhash: "password goes here"
+  jwt: "and another one here"
+# all keys must be 6-128 characters long...
+# you can use the same password for everything if you don't care

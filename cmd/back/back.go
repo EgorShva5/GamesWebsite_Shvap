@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"GamesWebsite.Shvap/internal/handler"
+	"GamesWebsite.Shvap/internal/middleware"
 	"GamesWebsite.Shvap/internal/store"
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +26,8 @@ func main() {
 
 	r.POST("api/register", handler.Register(db))
 	r.POST("api/login", handler.Login(db))
+
+	r.GET("/newgame", middleware.JWTAuthMiddleware(), handler.LoadGameMaker)
 
 	r.Run(":3000")
 }

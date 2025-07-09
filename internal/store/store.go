@@ -16,22 +16,26 @@ type Database struct {
 	DB *sql.DB
 }
 
-// Struct for config variables
+// Struct for config variables.
 type Config struct {
-	DB struct {
-		Secret string `yaml:"secret"`
-	} `yaml:"db"`
+	Keys struct {
+		PassHash string `yaml:"passhash"`
+		JWT      string `yaml:"jwt"`
+	} `yaml:"keys"`
 }
 
-// Check if the password is too short.
+// Check if the keys are too short or too long.
 func (cfg *Config) validate() error {
-	if tmp := len(cfg.DB.Secret); tmp < 6 || tmp > 128 {
-		return fmt.Errorf("secret length should be 6-128 characters (got %v) hint: change it in config/config.yaml", tmp)
+	if tmp := len(cfg.Keys.PassHash); tmp < 6 || tmp > 128 {
+		return fmt.Errorf("the length of every key should be 6-128 characters (got %v for the PassHash key) hint: change them in config/config.yaml", tmp)
+	}
+	if tmp := len(cfg.Keys.JWT); tmp < 6 || tmp > 128 {
+		return fmt.Errorf("the length of every key should be 6-128 characters (got %v for the JWT key) hint: change them in config/config.yaml", tmp)
 	}
 	return nil
 }
 
-var config = Config{}
+var Cfg = Config{}
 
 // Load the database, creating one if it doesn't exist. Load config. note: don't forget to defer close.
 func Init() (*Database, error) {
@@ -40,11 +44,11 @@ func Init() (*Database, error) {
 		return nil, fmt.Errorf("failed to read config (did you forget to create one?): %w", err)
 	}
 
-	if err = yaml.Unmarshal(data, &config); err != nil {
+	if err = yaml.Unmarshal(data, &Cfg); err != nil {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
 
-	if err := config.validate(); err != nil {
+	if err := Cfg.validate(); err != nil {
 		return nil, err
 	}
 
@@ -92,7 +96,7 @@ func (db *Database) CheckUserExists(login string) (bool, error) {
 
 // Register a new user.
 func (db *Database) Register(login string, password string) error {
-	password += config.DB.Secret
+	password += Cfg.Keys.PassHash
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -106,10 +110,10 @@ func (db *Database) Register(login string, password string) error {
 	return nil
 }
 
-// Check user password. Error if user does not exist.
+// Check user password. Return nil on success.
 func (db *Database) CheckPassword(login string, password string) error {
 	var storedHash []byte
-	password += config.DB.Secret
+	password += Cfg.Keys.PassHash
 
 	err := db.DB.QueryRow("SELECT password FROM users WHERE login = ?", login).Scan(&storedHash)
 	if err != nil {
