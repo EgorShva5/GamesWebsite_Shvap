@@ -22,24 +22,26 @@
         </header>
         
         <main class = 'ElementsCenter'>
+            <div class = 'CenterItems'>
             <form id="registerForm" method="post">
-                <div class='v_div2'>
+                <div class='v_div_center'>
                 <input type="text" name="display" placeholder="Отображаемое имя" size="45px" minlength="4" maxlength="32" required>  
                 <input type="text" name="login" placeholder="Логин" size="45px" minlength="2" maxlength="32" required>
                 <input type="password" id="password" placeholder="Пароль" size="45px" minlength="6" maxlength="128" required>
-                <button type="submit" value="Submit" size="30px" value="Register">
+                <button type="submit" value="Submit" size="30px" value="Register" id = 'sub2'><label for='sub2'>Отправить данные</label>
                 </div>
             </form>
 
             <form style = 'display:none' id="loginForm" method="post">
-                <div class='v_div2'>
+                <div class='v_div_center'>
                 <input type="text" name="login" placeholder="Логин" size="45px" minlength="2" maxlength="32" required>
                 <input type="password" id="password" placeholder="Пароль" size="45px" minlength="6" maxlength="128" required>
-                <button type="submit" value="Submit" size="30px" value="Login">
+                <button type="submit" value="Submit" size="30px" value="Login" id = 'sub'> <label for='sub'>Отправить данные</label>
                 </div>
             </form>
 
-            <input type='button' id='ch_btn' value='Вход'> 
+            <input type='button' id='ch_btn' value='Уже есть аккаунт? Войти'>
+            </div>
         </main>
 
         <footer>

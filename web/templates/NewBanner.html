@@ -5,31 +5,38 @@
         <link rel="stylesheet" type="text/css" href="/static/css/base.css">
     </head>
 
-    <header>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <div class = 'header_content'>
-            <a class = 'HeaderBtn' href="https://google.com">Game<b>S</b></a>
-       
-            <div class = 'h_container Margin'>
-                <a class = 'HeaderBtn' href="/home">Каталог</a>
-                <a class = 'HeaderBtn' href="https://google.com">Бибилиотека</a>
-                <a class = 'HeaderBtn' href="/newgame">Сообщество</a>
-                <a class = 'HeaderBtn' href="/auth">Войти</a>
-            </div>
-        </div>
-    </header>
-
     <body>
-        <img src="/static/img/mybffr.jpeg" alt="Картинка">
-
+        <div class = 'v_div'>
+        <header>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <div class = 'header_content'>
+                <a class = 'HeaderBtn' href="https://google.com">Game<b>S</b></a>
+           
+                <div class = 'h_container Margin'>
+                    <a class = 'HeaderBtn' href="/home">Каталог</a>
+                    <a class = 'HeaderBtn' href="https://google.com">Бибилиотека</a>
+                    <a class = 'HeaderBtn' href="/newgame">Сообщество</a>
+                    <a class = 'HeaderBtn' href="/auth">Войти</a>
+                </div>
+            </div>
+        </header>
+        <!--<img src="/static/img/mybffr.jpeg" alt="Картинка">-->
+        
         <form id="bannerForm" method="post">
-                <div class='v_div2'>
+            <div class = 'CenterItems'>
+                <div class='v_div_center'>
                 <input type="text" name="title" placeholder="Заголовок" size="45px" minlength="2" maxlength="128" required>
                 <input type="text" name="description" placeholder="Описание" size="45px" maxlength="256">
                 <input type="text" name="url" placeholder="Ссылка" size="45px" required>
-                <button type="submit" value="Submit" size="30px" value="Отправить">
+                <button type="submit" value="Submit" size="30px" value="Отправить" id ='sub'> <label for = 'sub'>Отправить данные</label>
                 </div>
+            </div>
         </form>
+
+        <footer>
+            <h1>© 2022-2025 Shvap. All rights reserved.</h1>
+        </footer>
+        </div>
     </body>
 
     <script type="text/javascript" src="/static/js/banner.js"></script>

@@ -1,16 +1,19 @@
 let LoginForm = document.getElementById('registerForm')
 let EnterForm = document.getElementById('loginForm')
 let ChBtn = document.getElementById('ch_btn')
+let IsReg = false
+
 ChBtn.addEventListener('click', function () {
-    if (ChBtn.value == 'Вход') {
+    if (!IsReg) {
         LoginForm.style.display = 'none';
         EnterForm.style.display = 'block';
-        ChBtn.value = 'Регистрация';
-    } else if (ChBtn.value == 'Регистрация') {
+        ChBtn.value = 'Ещё нет аккаунта? Регистрация'; 
+    } else {
         LoginForm.style.display = 'block';
         EnterForm.style.display = 'none'; 
-        ChBtn.value = 'Вход';
+        ChBtn.value = 'Уже есть аккаунт? Вход';
     }
+    IsReg = !IsReg
 })
 
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
