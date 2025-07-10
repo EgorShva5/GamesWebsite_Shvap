@@ -9,11 +9,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// Amount of games created.
 var GameCount int
 
-// Struct for auth credentials.
-type AuthRequest struct {
-	Login    string `json:"login" binding:"required,min=4,max=32"`
+// Struct for registration data.
+type RegisterRequest struct {
+	DisplayName string `json:"display" binding:"required,min=4,max=32"`
+	LoginRequest
+}
+
+// Struct for login credentials.
+type LoginRequest struct {
+	Login    string `json:"login" binding:"required,min=2,max=32"`
 	Password string `json:"password" binding:"required,min=6,max=128"`
 }
 
@@ -21,6 +28,7 @@ type AuthRequest struct {
 type Banner struct {
 	Title       string `json:"title" binding:"required,min=2,max=128"`
 	Description string `json:"description" binding:"max=256"`
+	Url         string `json:"url" binding:"required,min=1"`
 }
 
 // Data inside a JWT.
@@ -58,7 +66,7 @@ func LoadGameMaker(ctx *gin.Context) {
 // Create a banner.
 func NewBanner(db *store.Database) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		_ = ctx.MustGet("login").(string)
+		login := ctx.MustGet("login").(string)
 		_ = ctx.MustGet("role").(string)
 
 		var req Banner
@@ -68,38 +76,38 @@ func NewBanner(db *store.Database) gin.HandlerFunc {
 			return
 		}
 
-		if r, _ := db.CheckBannerExists(req.Title); r {
-			ctx.JSON(http.StatusConflict, gin.H{"error": "game with this title already exists"})
+		if err := db.CheckBannerExists(req.Title); err != nil {
+			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
 
-		if err := db.NewBanner(req.Title, req.Description); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "cound not create banner"})
+		if err := db.NewBanner(req.Title, req.Description, login, req.Url); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
 		ctx.JSON(http.StatusCreated, gin.H{})
-		db.UpdateCount(&GameCount)
+		db.UpdateGames(&GameCount)
 	}
 }
 
 // Check if user input is valid and register a new account.
 func Register(db *store.Database) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req AuthRequest
+		var req RegisterRequest
 
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		if r, _ := db.CheckUserExists(req.Login); r {
-			ctx.JSON(http.StatusConflict, gin.H{"error": "user already exists"})
+		if err := db.CheckUserExists(req.DisplayName, req.Login); err != nil {
+			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
 
-		if err := db.Register(req.Login, req.Password); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "could not create user"})
+		if err := db.Register(req.DisplayName, req.Login, req.Password); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -110,15 +118,15 @@ func Register(db *store.Database) gin.HandlerFunc {
 // Check password and authorize user, store JWT-token as a cookie.
 func Login(db *store.Database) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var req AuthRequest
+		var req LoginRequest
 
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		if r := db.CheckPassword(req.Login, req.Password); r != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to login"})
+		if err := db.CheckPassword(req.Login, req.Password); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 

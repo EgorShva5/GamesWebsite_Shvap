@@ -62,6 +62,7 @@ func Init() (*Database, error) {
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS users(
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			display TEXT NOT NULL UNIQUE,
 			login TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL
 		);
@@ -70,6 +71,8 @@ func Init() (*Database, error) {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			title TEXT NOT NULL UNIQUE,
 			description TEXT,
+			author TEXT NOT NULL,
+			url TEXT,
 			time_created TEXT NOT NULL
 		);
 	`)
@@ -82,30 +85,39 @@ func Init() (*Database, error) {
 }
 
 // Check if user exists. Return false only if the user does not exist and no errors occurred.
-func (db *Database) CheckUserExists(login string) (bool, error) {
+func (db *Database) CheckUserExists(display, login string) error {
 	var exists bool
 
-	err := db.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE login = ?)", login).Scan(&exists)
+	err := db.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE display = ?)", display).Scan(&exists)
 	if err != nil {
-		return true, fmt.Errorf("failed to check if user exists: %w", err)
+		return fmt.Errorf("failed to check if user exists")
 	}
 	if exists {
-		return true, nil
+		return fmt.Errorf("display name already exists")
 	}
-	return false, nil
+
+	err = db.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE login = ?)", login).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("failed to check if user exists")
+	}
+	if exists {
+		return fmt.Errorf("login already exists")
+	}
+
+	return nil
 }
 
 // Register a new user.
-func (db *Database) Register(login string, password string) error {
+func (db *Database) Register(display, login string, password string) error {
 	password += Cfg.Keys.PassHash
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return fmt.Errorf("failed to encrypt the password: %w", err)
+		return fmt.Errorf("failed to encrypt the password")
 	}
-	_, err = db.DB.Exec("INSERT INTO users (login, password) VALUES (?, ?)", login, string(hashedPass))
+	_, err = db.DB.Exec("INSERT INTO users (display, login, password) VALUES (?, ?, ?)", display, login, string(hashedPass))
 	if err != nil {
-		return fmt.Errorf("failed to store user in the database: %w", err)
+		return fmt.Errorf("failed to store user in the database")
 	}
 
 	return nil
@@ -123,37 +135,41 @@ func (db *Database) CheckPassword(login, password string) error {
 
 	err = bcrypt.CompareHashAndPassword(storedHash, []byte(password))
 	if err != nil {
-		return fmt.Errorf("failed to compare passwords")
+		return fmt.Errorf("failed to login")
 	}
 	return nil
 }
 
 // Check if a banner already exists. Return false only if the banner does not exist and no errors occurred.
-func (db *Database) CheckBannerExists(title string) (bool, error) {
+func (db *Database) CheckBannerExists(title string) error {
 	var exists bool
 
 	err := db.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM banners WHERE title = ?)", title).Scan(&exists)
 	if err != nil {
-		return true, fmt.Errorf("failed to check if banner exists: %w", err)
+		return fmt.Errorf("failed to check if banner exists")
 	}
 	if exists {
-		return true, nil
+		return fmt.Errorf("banner with this title already exists")
 	}
 
-	return false, nil
+	return nil
 }
 
 // Store a banner in the database.
-func (db *Database) NewBanner(title, description string) error {
-	_, err := db.DB.Exec("INSERT INTO banners (title, description, time_created) VALUES (?, ?, ?)", strings.TrimSpace(title), strings.TrimSpace(description), time.Now().Format(time.DateTime))
+func (db *Database) NewBanner(title, description, author, url string) error {
+	err := db.DB.QueryRow("SELECT display FROM users WHERE login = ?", author).Scan(&author)
 	if err != nil {
-		return fmt.Errorf("failed to create a new banner")
+		return fmt.Errorf("failed to create a new banner 1")
+	}
+	_, err = db.DB.Exec("INSERT INTO banners (title, description, author, url, time_created) VALUES (?, ?, ?, ?, ?)", strings.TrimSpace(title), strings.TrimSpace(description), author, strings.TrimSpace(url), time.Now().Format(time.DateTime))
+	if err != nil {
+		return fmt.Errorf("failed to create a new banner 2")
 	}
 	return nil
 }
 
-// Update the amount of uploaded banners
-func (db *Database) UpdateCount(GameCount *int) error {
+// Update the amount of uploaded banners.
+func (db *Database) UpdateGames(GameCount *int) error {
 	err := db.DB.QueryRow("SELECT COUNT(id) FROM banners").Scan(GameCount)
 	if err != nil {
 		return fmt.Errorf("failed to update game counter: %w", err)

@@ -2,8 +2,9 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const formData = {
-        title: e.target.title.value,
-        description: e.target.description.value,
+        title: e.target.title.value.trim(),
+        description: e.target.description.value.trim(),
+        url: e.target.url.value.trim()
     };
     try {
         const response = await fetch(window.location.origin + "/api/newbanner", {

@@ -17,6 +17,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     e.preventDefault();
     
     const formData = {
+        display: e.target.display.value,
         login: e.target.login.value,
         password: e.target.password.value
     };

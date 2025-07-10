@@ -15,7 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.DB.Close()
-	db.UpdateCount(&handler.GameCount)
+	db.UpdateGames(&handler.GameCount)
 
 	r := gin.New()
 	r.LoadHTMLGlob("web/templates/*")
