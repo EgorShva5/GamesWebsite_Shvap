@@ -26,6 +26,19 @@ type Config struct {
 	} `yaml:"keys"`
 }
 
+// Struct for banner parsing.
+type BannerParse struct {
+	Title       string `json:"title" binding:"required,min=2,max=128"`
+	Description string `json:"description" binding:"max=256"`
+	Url         string `json:"url" binding:"required,min=1"`
+}
+
+// Struct for a full banner.
+type Banner struct {
+	BannerParse
+	Author string `json:"author"`
+}
+
 // Check if the keys are too short or too long.
 func (cfg *Config) validate() error {
 	if tmp := len(cfg.Keys.PassHash); tmp < 6 || tmp > 128 {
@@ -169,10 +182,32 @@ func (db *Database) NewBanner(title, description, author, url string) error {
 }
 
 // Update the amount of uploaded banners.
-func (db *Database) UpdateGames(GameCount *int) error {
-	err := db.DB.QueryRow("SELECT COUNT(id) FROM banners").Scan(GameCount)
+func (db *Database) UpdateGames() (int, error) {
+	var count int
+	err := db.DB.QueryRow("SELECT COUNT(id) FROM banners").Scan(&count)
 	if err != nil {
-		return fmt.Errorf("failed to update game counter: %w", err)
+		return -1, fmt.Errorf("failed to update game counter: %w", err)
 	}
-	return nil
+	return count, nil
+}
+
+// Update banner slice.
+func (db *Database) UpdateBannerSlice() ([]Banner, error) {
+	var slice []Banner
+
+	rows, err := db.DB.Query("SELECT title, description, author, url FROM banners")
+	if err != nil {
+		return nil, fmt.Errorf("failed to update banner slice: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var b Banner
+		err := rows.Scan(&b.Title, &b.Description, &b.Author, &b.Url)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve row from db")
+		}
+		slice = append(slice, b)
+	}
+	return slice, nil
 }

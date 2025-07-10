@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -12,6 +13,9 @@ import (
 // Amount of games created.
 var GameCount int
 
+// Slice of all banners.
+var BannerSlice []store.Banner
+
 // Struct for registration data.
 type RegisterRequest struct {
 	DisplayName string `json:"display" binding:"required,min=4,max=32"`
@@ -22,13 +26,6 @@ type RegisterRequest struct {
 type LoginRequest struct {
 	Login    string `json:"login" binding:"required,min=2,max=32"`
 	Password string `json:"password" binding:"required,min=6,max=128"`
-}
-
-// Struct for banners.
-type Banner struct {
-	Title       string `json:"title" binding:"required,min=2,max=128"`
-	Description string `json:"description" binding:"max=256"`
-	Url         string `json:"url" binding:"required,min=1"`
 }
 
 // Data inside a JWT.
@@ -63,13 +60,18 @@ func LoadGameMaker(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "NewBanner.html", gin.H{})
 }
 
+// Retrieve all banners.
+func RetrieveBanners(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, BannerSlice)
+}
+
 // Create a banner.
 func NewBanner(db *store.Database) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		login := ctx.MustGet("login").(string)
 		_ = ctx.MustGet("role").(string)
 
-		var req Banner
+		var req store.BannerParse
 
 		if err := ctx.ShouldBindJSON(&req); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -81,13 +83,21 @@ func NewBanner(db *store.Database) gin.HandlerFunc {
 			return
 		}
 
-		if err := db.NewBanner(req.Title, req.Description, login, req.Url); err != nil {
+		err := db.NewBanner(req.Title, req.Description, login, req.Url)
+		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
 		ctx.JSON(http.StatusCreated, gin.H{})
-		db.UpdateGames(&GameCount)
+		GameCount, err = db.UpdateGames()
+		if err != nil {
+			log.Println(err.Error())
+		}
+		BannerSlice, err = db.UpdateBannerSlice()
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 }
 
