@@ -15,6 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.DB.Close()
+	db.UpdateCount(&handler.GameCount)
 
 	r := gin.New()
 	r.LoadHTMLGlob("web/templates/*")
@@ -26,6 +27,7 @@ func main() {
 
 	r.POST("api/register", handler.Register(db))
 	r.POST("api/login", handler.Login(db))
+	r.POST("api/newbanner", middleware.JWTAuthMiddleware(), handler.NewBanner(db))
 
 	r.GET("/newgame", middleware.JWTAuthMiddleware(), handler.LoadGameMaker)
 

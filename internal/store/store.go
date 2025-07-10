@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/yaml.v3"
@@ -66,10 +68,9 @@ func Init() (*Database, error) {
 
 		CREATE TABLE IF NOT EXISTS banners(
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			filename TEXT NOT NULL,	
-			title TEXT NOT NULL,
-			description TEXT NOT NULL,
-			color TEXT NOT NULL
+			title TEXT NOT NULL UNIQUE,
+			description TEXT,
+			time_created TEXT NOT NULL
 		);
 	`)
 	if err != nil {
@@ -111,7 +112,7 @@ func (db *Database) Register(login string, password string) error {
 }
 
 // Check user password. Return nil on success.
-func (db *Database) CheckPassword(login string, password string) error {
+func (db *Database) CheckPassword(login, password string) error {
 	var storedHash []byte
 	password += Cfg.Keys.PassHash
 
@@ -123,6 +124,39 @@ func (db *Database) CheckPassword(login string, password string) error {
 	err = bcrypt.CompareHashAndPassword(storedHash, []byte(password))
 	if err != nil {
 		return fmt.Errorf("failed to compare passwords")
+	}
+	return nil
+}
+
+// Check if a banner already exists. Return false only if the banner does not exist and no errors occurred.
+func (db *Database) CheckBannerExists(title string) (bool, error) {
+	var exists bool
+
+	err := db.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM banners WHERE title = ?)", title).Scan(&exists)
+	if err != nil {
+		return true, fmt.Errorf("failed to check if banner exists: %w", err)
+	}
+	if exists {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+// Store a banner in the database.
+func (db *Database) NewBanner(title, description string) error {
+	_, err := db.DB.Exec("INSERT INTO banners (title, description, time_created) VALUES (?, ?, ?)", strings.TrimSpace(title), strings.TrimSpace(description), time.Now().Format(time.DateTime))
+	if err != nil {
+		return fmt.Errorf("failed to create a new banner")
+	}
+	return nil
+}
+
+// Update the amount of uploaded banners
+func (db *Database) UpdateCount(GameCount *int) error {
+	err := db.DB.QueryRow("SELECT COUNT(id) FROM banners").Scan(GameCount)
+	if err != nil {
+		return fmt.Errorf("failed to update game counter: %w", err)
 	}
 	return nil
 }

@@ -9,10 +9,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var GameCount int
+
 // Struct for auth credentials.
 type AuthRequest struct {
-	Login    string `json:"login" binding:"required,min=3,max=32"`
+	Login    string `json:"login" binding:"required,min=4,max=32"`
 	Password string `json:"password" binding:"required,min=6,max=128"`
+}
+
+// Struct for banners.
+type Banner struct {
+	Title       string `json:"title" binding:"required,min=2,max=128"`
+	Description string `json:"description" binding:"max=256"`
 }
 
 // Data inside a JWT.
@@ -29,7 +37,9 @@ func RedirectHome(ctx *gin.Context) {
 
 // Load home page.
 func LoadHome(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "Home.html", gin.H{})
+	ctx.HTML(http.StatusOK, "Home.html", gin.H{
+		"GameCount": GameCount,
+	})
 }
 
 // Load auth page.
@@ -43,6 +53,34 @@ func LoadGameMaker(ctx *gin.Context) {
 	_ = ctx.MustGet("role").(string)
 
 	ctx.HTML(http.StatusOK, "NewBanner.html", gin.H{})
+}
+
+// Create a banner.
+func NewBanner(db *store.Database) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		_ = ctx.MustGet("login").(string)
+		_ = ctx.MustGet("role").(string)
+
+		var req Banner
+
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if r, _ := db.CheckBannerExists(req.Title); r {
+			ctx.JSON(http.StatusConflict, gin.H{"error": "game with this title already exists"})
+			return
+		}
+
+		if err := db.NewBanner(req.Title, req.Description); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "cound not create banner"})
+			return
+		}
+
+		ctx.JSON(http.StatusCreated, gin.H{})
+		db.UpdateCount(&GameCount)
+	}
 }
 
 // Check if user input is valid and register a new account.
