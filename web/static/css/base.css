@@ -1,24 +1,12 @@
-body {
-    padding: 0;
-    margin: 0; 
-    background-color: #872341;
-}
-
-header {
-    position: relative;
-    background-color: #22092C;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 100%;
-    height: 50px;
-}
-
 .v_div {
     display: flex;
     flex-direction: column;
     /*background-color: aqua;*/
     min-height: 100vh;
+}
+
+.v_div.bck {
+    background-image: linear-gradient(to top,#421952, #872341);
 }
 
 .v_div2 {
@@ -48,11 +36,6 @@ header * {
     display: inline-flex;
 }
 
-h1,h2,h3,p,a,h4,h5,h6 {
-    font-family: Jost;
-    color: aliceblue;
-}
-
 .HeaderBtn {
     transition: all .2s;
     color: aliceblue;
@@ -79,19 +62,6 @@ h1,h2,h3,p,a,h4,h5,h6 {
 
 .big_artilce {
     font-size: 50px;
-}
-
-footer {
-    position: relative;
-    text-align: center;
-    background-color: #22092C;
-    display: flex;
-    flex-direction:column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin-top: auto;
-
 }
 
 .h_container {
@@ -145,14 +115,6 @@ footer {
     max-width: 900px;
 }
 
-a {
-    text-decoration: none;
-}
-
-p {
-    font-size: 25px;
-}
-
 .Game p {
     font-size: 15px;
 }
@@ -185,10 +147,6 @@ p {
 
     .Game p {
         font-size: 15px;
-    }
-
-    footer {
-        font-size: 13px;
     }
   }
 

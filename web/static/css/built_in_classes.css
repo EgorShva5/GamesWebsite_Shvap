@@ -1,0 +1,94 @@
+body {
+    padding: 0;
+    margin: 0; 
+    background-color: #872341;
+}
+
+header {
+    position: relative;
+    background-color: #22092C;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100%;
+    height: 50px;
+}
+
+h1,h2,h3,p,a,h4,h5,h6 {
+    font-family: Jost;
+    color: aliceblue;
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    font-size: 25px;
+}
+
+footer {
+    position: relative;
+    text-align: center;
+    background-color: #22092C;
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: auto;
+
+}
+
+label {
+    font-family: 'Jost';
+    font-size: 20px;
+    color: aliceblue;
+}
+
+label:hover {
+    cursor: pointer;
+}
+
+input, input:focus, input:checked, input:focus-within {
+    transition: all .2s;
+    scale: 1;
+
+    border: none;
+    font-family: 'Jost';
+    font-size: 20px;
+    color: aliceblue;
+    background-color: #22092C;
+}
+
+input:hover {
+    scale: 1.1;
+    box-shadow: #22092C 0px 0px 15px;
+}
+
+input[type=button] {
+    cursor: pointer;
+}
+
+button {
+    transition: all .2s;
+    scale: 1;
+
+    border: none;
+    font-family: 'Jost';
+    font-size: 20px;
+    color: aliceblue;
+    background-color: #22092C;
+}
+
+button:hover{
+    cursor: pointer;
+    scale: 1.1;
+    box-shadow: #22092C 0px 0px 15px;
+}
+
+@media (max-width: 600px) {
+    footer {
+        font-size: 13px;
+    }
+}
