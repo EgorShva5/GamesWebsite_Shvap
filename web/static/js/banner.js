@@ -1,18 +1,12 @@
 document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const formData = {
-        title: e.target.title.value.trim(),
-        description: e.target.description.value.trim(),
-        url: e.target.url.value.trim()
-    };
+    const formData = new FormData(e.target)
+
     try {
         const response = await fetch(window.location.origin + "/api/newbanner", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
+            body: formData,
         });
         const result = await response.json();
         
@@ -24,4 +18,5 @@ document.getElementById('bannerForm').addEventListener('submit', async (e) => {
     } catch (error) {
         alert('Ошибка сети: ' + error.message);
     }
+
 });

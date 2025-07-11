@@ -3,12 +3,16 @@ package handler
 import (
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"GamesWebsite.Shvap/internal/store"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 // Amount of games created.
@@ -16,6 +20,14 @@ var GameCount int
 
 // Slice of all banners.
 var BannerSlice []store.Banner
+
+// Allowed extensions.
+var Extensions = map[string]bool{
+	".png":  true,
+	".jpg":  true,
+	".jpeg": true,
+	".webp": true,
+}
 
 // Struct for registration data.
 type RegisterRequest struct {
@@ -86,25 +98,52 @@ func NewBanner(db *store.Database) gin.HandlerFunc {
 		login := ctx.MustGet("login").(string)
 		_ = ctx.MustGet("role").(string)
 
-		var req store.BannerParse
-
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if !strings.Contains(ctx.ContentType(), "multipart/form-data") {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "multipart/form-data required"})
 			return
 		}
 
-		if err := db.CheckBannerExists(req.Title); err != nil {
+		title := ctx.PostForm("title")
+		description := ctx.PostForm("description")
+		url := ctx.PostForm("url")
+
+		file, err := ctx.FormFile("image")
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to get image"})
+			return
+		}
+
+		ext := strings.ToLower(filepath.Ext(file.Filename))
+		if !Extensions[ext] {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "allowed extensions: png, jpg, jpeg, webp"})
+			return
+		}
+
+		var imageName string
+		var uploadPath string
+		for {
+			imageName = uuid.New().String() + ext
+			uploadPath = "./web/static/img/banners/" + imageName
+			if _, err := os.Stat(uploadPath); os.IsNotExist(err) {
+				break
+			}
+		}
+		if err := ctx.SaveUploadedFile(file, uploadPath); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save image"})
+			return
+		}
+
+		if err := db.CheckBannerExists(title); err != nil {
 			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}
 
-		err := db.NewBanner(req.Title, req.Description, login, req.Url)
+		err = db.NewBanner(title, description, login, url, imageName)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, gin.H{})
 		GameCount, err = db.UpdateGames()
 		if err != nil {
 			log.Println(err.Error())
@@ -114,6 +153,8 @@ func NewBanner(db *store.Database) gin.HandlerFunc {
 			log.Println(err.Error())
 		}
 		MaxPage = uint64((len(BannerSlice) + PerPage - 1) / PerPage)
+
+		ctx.JSON(http.StatusCreated, gin.H{})
 	}
 }
 

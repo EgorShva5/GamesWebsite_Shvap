@@ -31,6 +31,7 @@ type BannerParse struct {
 	Title       string `json:"title" binding:"required,min=2,max=128"`
 	Description string `json:"description" binding:"max=256"`
 	Url         string `json:"url" binding:"required,min=1"`
+	ImageName   string `json:"image" binding:"required"`
 }
 
 // Struct for a full banner.
@@ -50,6 +51,7 @@ func (cfg *Config) validate() error {
 	return nil
 }
 
+// Variable to store keys.
 var Cfg = Config{}
 
 // Load the database, creating one if it doesn't exist. Load config. note: don't forget to defer close.
@@ -85,7 +87,8 @@ func Init() (*Database, error) {
 			title TEXT NOT NULL UNIQUE,
 			description TEXT,
 			author TEXT NOT NULL,
-			url TEXT,
+			url TEXT NOT NULL,
+			image TEXT NOT NULL,
 			time_created TEXT NOT NULL
 		);
 	`)
@@ -169,12 +172,15 @@ func (db *Database) CheckBannerExists(title string) error {
 }
 
 // Store a banner in the database.
-func (db *Database) NewBanner(title, description, author, url string) error {
+func (db *Database) NewBanner(title, description, author, url, img string) error {
 	err := db.DB.QueryRow("SELECT display FROM users WHERE login = ?", author).Scan(&author)
 	if err != nil {
 		return fmt.Errorf("failed to create a new banner 1")
 	}
-	_, err = db.DB.Exec("INSERT INTO banners (title, description, author, url, time_created) VALUES (?, ?, ?, ?, ?)", strings.TrimSpace(title), strings.TrimSpace(description), author, strings.TrimSpace(url), time.Now().Format(time.DateTime))
+	if !strings.Contains(url, "http://") {
+		url = "https://" + url
+	}
+	_, err = db.DB.Exec("INSERT INTO banners (title, description, author, url, image, time_created) VALUES (?, ?, ?, ?, ?, ?)", strings.TrimSpace(title), strings.TrimSpace(description), author, strings.TrimSpace(url), img, time.Now().Format(time.DateTime))
 	if err != nil {
 		return fmt.Errorf("failed to create a new banner 2")
 	}
@@ -195,7 +201,7 @@ func (db *Database) UpdateGames() (int, error) {
 func (db *Database) UpdateBannerSlice() ([]Banner, error) {
 	var slice []Banner
 
-	rows, err := db.DB.Query("SELECT title, description, author, url FROM banners")
+	rows, err := db.DB.Query("SELECT title, description, author, url, image FROM banners")
 	if err != nil {
 		return nil, fmt.Errorf("failed to update banner slice: %w", err)
 	}
@@ -203,7 +209,8 @@ func (db *Database) UpdateBannerSlice() ([]Banner, error) {
 
 	for rows.Next() {
 		var b Banner
-		err := rows.Scan(&b.Title, &b.Description, &b.Author, &b.Url)
+		err := rows.Scan(&b.Title, &b.Description, &b.Author, &b.Url, &b.ImageName)
+		b.ImageName = "/static/img/banners/" + b.ImageName
 		if err != nil {
 			return nil, fmt.Errorf("failed to retrieve row from db")
 		}

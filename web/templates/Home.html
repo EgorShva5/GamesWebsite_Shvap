@@ -97,7 +97,7 @@
                 {{ range $banner := .banners }} 
                 <div class="Game">
                     <a href="{{ .Url }}" title="Привет!">
-                        <img src="/static/img/ewwie.jpg" alt="Картинка">
+                        <img src="{{ .ImageName }}" alt="Картинка">
                         <h1>{{ .Title }}</h1>
                         <p>{{ .Description }}</p>
                         <p>Автор: {{ .Author }}</p>
