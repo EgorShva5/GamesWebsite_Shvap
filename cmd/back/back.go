@@ -24,6 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	handler.MaxPage = uint64((len(handler.BannerSlice) + handler.PerPage - 1) / handler.PerPage)
 
 	r := gin.New()
 	r.LoadHTMLGlob("web/templates/*")

@@ -94,11 +94,21 @@
                     <p>Шутер от первого лица в сеттинге постапокалипсиса. 2D графика и данамичный геймплей не дадут заскучать!</p>
                     </a>
                 -->
+                {{ range $banner := .banners }} 
+                <div class="Game">
+                    <a href="{{ .Url }}" title="Привет!">
+                        <img src="/static/img/ewwie.jpg" alt="Картинка">
+                        <h1>{{ .Title }}</h1>
+                        <p>{{ .Description }}</p>
+                        <p>Автор: {{ .Author }}</p>
+                    </a>
+                </div>
+                {{ end }}
                 </div>
                 <div id = 'Btns'>
-                    <input type = 'button' value = 'fghfgh' name ='gfhgfh' id = 'btn1'>
+                    <input type = 'button' value = '' name ='gfhgfh' id = 'btn1'>
                     <input type = 'button' value = '' id = 'btn2'>
-                    <input type = 'button' value = '' id = 'btn3'>
+                    <input type = 'button' value = '{{ .page }}/{{ .maxpage }}' id = 'btn3'>
                     <input type = 'button' value = '' id = 'btn4'>
                     <input type = 'button' value = '' id = 'btn5'>
                 </div>

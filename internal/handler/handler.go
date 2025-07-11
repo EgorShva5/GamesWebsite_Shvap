@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"GamesWebsite.Shvap/internal/store"
@@ -42,8 +43,21 @@ func RedirectHome(ctx *gin.Context) {
 
 // Load home page.
 func LoadHome(ctx *gin.Context) {
+	str := ctx.Query("page")
+
+	page, err := strconv.ParseUint(str, 10, 64)
+	if err != nil || page == 0 {
+		page = 1
+	}
+	if page > MaxPage {
+		page = MaxPage
+	}
+
 	ctx.HTML(http.StatusOK, "Home.html", gin.H{
 		"GameCount": GameCount,
+		"banners":   BannerSlice[(page-1)*PerPage : PerPage*page],
+		"page":      page,
+		"maxpage":   MaxPage,
 	})
 }
 
@@ -98,6 +112,7 @@ func NewBanner(db *store.Database) gin.HandlerFunc {
 		if err != nil {
 			log.Println(err.Error())
 		}
+		MaxPage = uint64((len(BannerSlice) + PerPage - 1) / PerPage)
 	}
 }
 
@@ -172,3 +187,8 @@ func GenerateJWT(login string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(store.Cfg.Keys.JWT))
 }
+
+// * Pagination * //
+const PerPage = 3
+
+var MaxPage uint64
