@@ -53,9 +53,10 @@ func LoadHome(ctx *gin.Context) {
 		page = MaxPage
 	}
 
+	end := min(PerPage*page, uint64(len(BannerSlice)))
 	ctx.HTML(http.StatusOK, "Home.html", gin.H{
 		"GameCount": GameCount,
-		"banners":   BannerSlice[(page-1)*PerPage : PerPage*page],
+		"banners":   BannerSlice[(page-1)*PerPage : end],
 		"page":      page,
 		"maxpage":   MaxPage,
 	})
