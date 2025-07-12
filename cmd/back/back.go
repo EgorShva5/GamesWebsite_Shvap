@@ -16,30 +16,25 @@ func main() {
 	}
 	defer db.DB.Close()
 
-	handler.GameCount, err = db.UpdateGames()
-	if err != nil {
-		log.Fatal(err)
-	}
-	handler.BannerSlice, err = db.UpdateBannerSlice()
-	if err != nil {
-		log.Fatal(err)
-	}
-	handler.MaxPage = uint64((len(handler.BannerSlice) + handler.PerPage - 1) / handler.PerPage)
+	handler.UpdateBannerCache(db)
 
 	r := gin.New()
-	r.LoadHTMLGlob("web/templates/*")
+	r.Use(middleware.JWTAuthMiddleware())
+
+	r.LoadHTMLGlob("./web/templates/*")
 	r.Static("/static", "./web/static")
 
 	r.GET("/", handler.RedirectHome)
-	r.GET("home", handler.LoadHome)
-	r.GET("auth", handler.LoadAuth)
+	r.GET("/home", handler.LoadHomePage)
+	r.GET("/auth", handler.LoadAuthPage)
+	r.GET("/newgame", middleware.EnsureAuth(), handler.LoadBannerCreationPage)
 
-	r.GET("api/banners", handler.RetrieveBanners)
-	r.POST("api/register", handler.Register(db))
-	r.POST("api/login", handler.Login(db))
-	r.POST("api/newbanner", middleware.JWTAuthMiddleware(), handler.NewBanner(db))
-
-	r.GET("/newgame", middleware.JWTAuthMiddleware(), handler.LoadGameMaker)
+	api := r.Group("/api")
+	api.GET("/banners", handler.RetrieveBanners)
+	api.POST("/register", handler.Register(db))
+	api.POST("/login", handler.Login(db))
+	api.POST("/newbanner", middleware.EnsureAuth(), handler.NewBanner(db))
+	api.POST("/logout", handler.Logout())
 
 	r.Run(":3000")
 }

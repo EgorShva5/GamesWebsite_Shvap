@@ -1,27 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-    <head>
-        <title>Авторизация</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/base.css">
-        <link rel="stylesheet" type="text/css" href="/static/css/built_in_classes.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
+{{ template "Base.html" . }}
 
-    <body>
-        <div class='v_div bck'>
-        <header>
-            <div class = 'header_content'>
-                <a class = 'HeaderBtn' href="/home">Game<b>S</b></a>
-           
-                <div class = 'h_container Margin'>
-                    <a class = 'HeaderBtn' href="/home">Каталог</a>
-                    <a class = 'HeaderBtn' href="https://google.com">Бибилиотека</a>
-                    <a class = 'HeaderBtn' href="/newgame">Сообщество</a>
-                    <a class = 'HeaderBtn' href="/auth">Войти</a>
-                </div>
-            </div>
-        </header>
-        
+{{ define "title" }}Авторизация{{ end }}
+
+{{ define "content" }}
         <main class = 'ElementsCenter'>
             <div class = 'CenterItems'>
             <form id="registerForm" method="post">
@@ -44,13 +25,8 @@
             <input type='button' id='ch_btn' value='Уже есть аккаунт? Войти'>
             </div>
         </main>
+{{ end }}
 
-        <footer>
-            <h1>© 2022-2025 Shvap. All rights reserved.</h1>
-        </footer>
-        </div>
-
-        <script type="text/javascript" src="/static/js/auth.js"></script>
-    </body>
-
-</html>
+{{ define "scripts" }}
+    <script type="text/javascript" src="/static/js/auth.js"></script>
+{{ end }}

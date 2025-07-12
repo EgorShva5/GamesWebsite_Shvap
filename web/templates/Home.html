@@ -1,100 +1,39 @@
-<!DOCTYPE html>
-<html lang="ru">
-    <head>
-        <title>Главная, игр: {{ .GameCount }}</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/base.css">
-        <link rel="stylesheet" type="text/css" href="/static/css/built_in_classes.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
+{{ template "Base.html" . }}
 
-    <body>
-        <header>
-            <div class = 'header_content'>
-                <a class = 'HeaderBtn' href="/home">Game<b>S</b></a>
-           
-                <div class = 'h_container Margin'>
-                    <a class = 'HeaderBtn' href="/home">Каталог</a>
-                    <a class = 'HeaderBtn' href="https://google.com">Бибилиотека</a>
-                    <a class = 'HeaderBtn' href="/newgame">Сообщество</a>
-                    <a class = 'HeaderBtn' href="/auth">Войти</a>
-                </div>
+{{ define "title" }}Главная, игр: {{ .BannerCount }}{{ end }}
+
+{{ define "content" }}
+    <main>
+        <div class="ElementsCenter FirstRazdel">
+            <div class = 'TextDiv'>
+                <h1 class="big_artilce">Что это за раздел?</h1>
+                <p> Добро пожаловать в каталог игр! В этом разделе вы найдете разнообразные развлечения — от приключений до головоломок. Каждая игра подарит вам новые эмоции и возможность подтянуть свои навыки. 
+                    <br><br>
+                    Присоединяйтесь к нам, играйте и делитесь впечатлениями!
+                </p>
             </div>
-        </header>
-        
-        <main>
-            <div class="ElementsCenter FirstRazdel">
-                <div class = 'TextDiv'>
-                    <h1 class="big_artilce">Что это за раздел?</h1>
-                    <p> Добро пожаловать в каталог игр! В этом разделе вы найдете разнообразные развлечения — от приключений до головоломок. Каждая игра подарит вам новые эмоции и возможность подтянуть свои навыки. 
-                        <br><br>
-                        Присоединяйтесь к нам, играйте и делитесь впечатлениями!
-                    </p>
-                </div>
-            </div>
-            <div>
-            
-            <div class="h_container Margin StickyPos">
-                <h1>Категории:</h1>
-                <p><input type = 'checkbox'>Стратегия</p>
-                <p><input type = 'checkbox'>Экшен</p>
-                <p><input type = 'checkbox'>Приключение</p>
-                <p><input type = 'checkbox'>Симулятор</p>
-                <p><input type = 'checkbox'>2D</p>
-                <p><input type = 'checkbox'>3D</p>
-                <p><input type = 'checkbox'>Хоррор</p>
-                <p><input type = 'checkbox'>Спорт</p>
-            </div>
-            
-            <div class="ElementsCenter">
-                <h1 class = 'big_artilce'>
-                    Каталог игр:
-                </h1>
-                <br>
-                <div class ='h_container GamesContainer'>
-                <!--
-                <div class="Game"> 
-                    <a href="https://www.google.com" title="Привет!">
-                    <img src="/static/img/DevMBDEMO.png" alt="Картинка">
-                    <h1>Название игры</h1>
-                    <p>Шутер от первого лица в сеттинге постапокалипсиса. 2D графика и данамичный геймплей не дадут заскучать!</p>
-                    </a>
-                </div>
-                <div class="Game"> 
-                    <a href="https://www.google.com" title="Привет!">
-                    <img src="/static/img/joltIc.png" alt="Картинка">
-                    <h1>Название игры</h1>
-                    <p>Шутер от первого лица в сеттинге постапокалипсиса. 2D графика и данамичный геймплей не дадут заскучать!</p>
-                    </a>
-                </div>
-                <div class="Game"> 
-                    <a href="https://www.google.com" title="Привет!">
-                    <img src="/static/img/TEST.png" alt="Картинка">
-                    <h1>Название игры</h1>
-                    <p>Шутер от первого лица в сеттинге постапокалипсиса. 2D графика и данамичный геймплей не дадут заскучать!</p>
-                    </a>
-                </div>
-                <div class="Game"> 
-                    <a href="https://www.google.com" title="Привет!">
-                    <img src="/static/img/DevMBDEMO.png" alt="Картинка">
-                    <h1>Название игры</h1>
-                    <p>Шутер от первого лица в сеттинге постапокалипсиса. 2D графика и данамичный геймплей не дадут заскучать!</p>
-                    </a>
-                </div>
-                <div class="Game"> 
-                    <a href="https://www.google.com" title="Привет!">
-                    <img src="/static/img/joltIc.png" alt="Картинка">
-                    <h1>Название игры</h1>
-                    <p>Шутер от первого лица в сеттинге постапокалипсиса. 2D графика и данамичный геймплей не дадут заскучать!</p>
-                    </a>
-                </div>
-                <div class="Game"> 
-                    <a href="https://www.google.com" title="Привет!">
-                    <img src="/static/img/TEST.png" alt="Картинка">
-                    <h1>Название игры</h1>
-                    <p>Шутер от первого лица в сеттинге постапокалипсиса. 2D графика и данамичный геймплей не дадут заскучать!</p>
-                    </a>
-                -->
-                {{ range $banner := .banners }} 
+        </div>
+        <div>
+
+        <div class="h_container Margin StickyPos">
+            <h1>Категории:</h1>
+            <p><input type = 'checkbox'>Стратегия</p>
+            <p><input type = 'checkbox'>Экшен</p>
+            <p><input type = 'checkbox'>Приключение</p>
+            <p><input type = 'checkbox'>Симулятор</p>
+            <p><input type = 'checkbox'>2D</p>
+            <p><input type = 'checkbox'>3D</p>
+            <p><input type = 'checkbox'>Хоррор</p>
+            <p><input type = 'checkbox'>Спорт</p>
+        </div>
+
+        <div class="ElementsCenter">
+            <h1 class = 'big_artilce'>
+                Каталог игр:
+            </h1>
+            <br>
+            <div class ='h_container GamesContainer'>
+            {{ range $Banner := .Banners }} 
                 <div class="Game">
                     <a href="{{ .Url }}" title="Привет!">
                         <img src="{{ .ImageName }}" alt="Картинка">
@@ -103,31 +42,28 @@
                         <p>Автор: {{ .Author }}</p>
                     </a>
                 </div>
-                {{ end }}
-                </div>
-                <div id = 'Btns'>
-                    <input type = 'button' value = '' name ='gfhgfh' id = 'btn1'>
-                    <input type = 'button' value = '' id = 'btn2'>
-                    <input type = 'button' value = '{{ .page }}/{{ .maxpage }}' id = 'btn3'>
-                    <input type = 'button' value = '' id = 'btn4'>
-                    <input type = 'button' value = '' id = 'btn5'>
-                </div>
+            {{ end }}
             </div>
-            
+            <div id = 'Btns'>
+                <input type = 'button' value = '' id = 'btn1'>
+                <input type = 'button' value = '' id = 'btn2'>
+                <input type = 'button' value = '{{ .Page }}/{{ .MaxPage }}' id = 'btn3'>
+                <input type = 'button' value = '' id = 'btn4'>
+                <input type = 'button' value = '' id = 'btn5'>
             </div>
-            </div>
-            <div class="ElementsCenter LastRazdel">
-                <br><br><br><br>
-                <div class="TextDiv"><h1 class="big_artilce">Упс! Похоже, это всё.</h1>
-                <p> Похоже, игр больше нет. Добавьте свою или следите за ваыходом новых!</p>
-                <br><br><br></div>
-            </div>
-        </main>
+        </div>
 
-        <footer>
-            <h1>© 2022-2025 Shvap. All rights reserved.</h1>
-        </footer>
+        </div>
+        </div>
+        <div class="ElementsCenter LastRazdel">
+            <br><br><br><br>
+            <div class="TextDiv"><h1 class="big_artilce">Упс! Похоже, это всё.</h1>
+            <p> Похоже, игр больше нет. Добавьте свою или следите за выходом новых!</p>
+            <br><br><br></div>
+        </div>
+    </main>
+{{ end }}
 
-        <script type="text/javascript" src="/static/js/home.js"></script>
-    </body>
-</html>
+{{ define "scripts" }}
+    <script type="text/javascript" src="/static/js/home.js"></script>
+{{ end }}

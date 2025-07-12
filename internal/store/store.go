@@ -13,6 +13,10 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+//
+/* VARIABLES AND STRUCTS */
+//
+
 // Struct for db and db-related methods.
 type Database struct {
 	DB *sql.DB
@@ -28,20 +32,27 @@ type Config struct {
 
 // Struct for banner parsing.
 type BannerParse struct {
-	Title       string `json:"title" binding:"required,min=2,max=128"`
-	Description string `json:"description" binding:"max=256"`
-	Url         string `json:"url" binding:"required,min=1"`
-	ImageName   string `json:"image" binding:"required"`
+	Title       string `json:"title" binding:"required,min=2,max=128"` // 2-128 chars
+	Description string `json:"description" binding:"max=256"`          // 0-256 chars
+	Url         string `json:"url" binding:"required,min=1"`           // just put something
+	ImageName   string `json:"image" binding:"required"`               // just upload something
 }
 
 // Struct for a full banner.
 type Banner struct {
 	BannerParse
-	Author string `json:"author"`
+	Author string `json:"author"` // login from jwt -> db -> author
 }
 
+// Variable to store keys.
+var Cfg = Config{}
+
+//
+/* VARIABLES AND STRUCTS END */
+//
+
 // Check if the keys are too short or too long.
-func (cfg *Config) validate() error {
+func (cfg *Config) Validate() error {
 	if tmp := len(cfg.Keys.PassHash); tmp < 6 || tmp > 128 {
 		return fmt.Errorf("the length of every key should be 6-128 characters (got %v for the PassHash key) hint: change them in config/config.yaml", tmp)
 	}
@@ -50,9 +61,6 @@ func (cfg *Config) validate() error {
 	}
 	return nil
 }
-
-// Variable to store keys.
-var Cfg = Config{}
 
 // Load the database, creating one if it doesn't exist. Load config. note: don't forget to defer close.
 func Init() (*Database, error) {
@@ -65,7 +73,7 @@ func Init() (*Database, error) {
 		return nil, fmt.Errorf("failed to load config: %w", err)
 	}
 
-	if err := Cfg.validate(); err != nil {
+	if err := Cfg.Validate(); err != nil {
 		return nil, err
 	}
 
@@ -92,35 +100,47 @@ func Init() (*Database, error) {
 			time_created TEXT NOT NULL
 		);
 	`)
+	var count int
+	dbret := &Database{DB: db}
+
+	if err := dbret.DB.QueryRow("SELECT COUNT(id) FROM banners").Scan(&count); err != nil {
+		return nil, fmt.Errorf("failed to check the amount of banners: %w", err)
+	}
+	if count == 0 {
+		if _, err = dbret.DB.Exec("INSERT INTO banners (title, description, author, url, image, time_created) VALUES (?, ?, ?, ?, ?, ?)", "Example", "", "*EXAMPLE*", "https://example.com", "placeholder.jpeg", time.Now().Format(time.DateTime)); err != nil {
+			return nil, fmt.Errorf("failed to add example banner: %w", err)
+		}
+	}
+
 	if err != nil {
 		db.Close()
 		return nil, fmt.Errorf("failed to create tables: %w", err)
 	}
 
-	return &Database{DB: db}, nil
+	return dbret, nil
 }
 
 // Check if user exists. Return false only if the user does not exist and no errors occurred.
 func (db *Database) CheckUserExists(display, login string) error {
-	var exists bool
+	var displayExists, loginExists bool
 
-	err := db.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE display = ?)", display).Scan(&exists)
+	err := db.DB.QueryRow(`
+    SELECT
+		EXISTS(SELECT 1 FROM users WHERE display = ?), 
+		EXISTS(SELECT 1 FROM users WHERE login = ?)
+	`, display, login).Scan(&displayExists, &loginExists)
 	if err != nil {
-		return fmt.Errorf("failed to check if user exists")
+		return fmt.Errorf("failed to check if user or display name exists")
 	}
-	if exists {
+
+	switch {
+	case displayExists:
 		return fmt.Errorf("display name already exists")
-	}
-
-	err = db.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE login = ?)", login).Scan(&exists)
-	if err != nil {
-		return fmt.Errorf("failed to check if user exists")
-	}
-	if exists {
+	case loginExists:
 		return fmt.Errorf("login already exists")
+	default:
+		return nil
 	}
-
-	return nil
 }
 
 // Register a new user.
@@ -146,7 +166,7 @@ func (db *Database) CheckPassword(login, password string) error {
 
 	err := db.DB.QueryRow("SELECT password FROM users WHERE login = ?", login).Scan(&storedHash)
 	if err != nil {
-		return fmt.Errorf("failed to retrieve password from db")
+		return fmt.Errorf("user not exists")
 	}
 
 	err = bcrypt.CompareHashAndPassword(storedHash, []byte(password))
@@ -173,14 +193,10 @@ func (db *Database) CheckBannerExists(title string) error {
 
 // Store a banner in the database.
 func (db *Database) NewBanner(title, description, author, url, img string) error {
-	err := db.DB.QueryRow("SELECT display FROM users WHERE login = ?", author).Scan(&author)
-	if err != nil {
-		return fmt.Errorf("failed to create a new banner 1")
-	}
 	if !strings.Contains(url, "http://") {
 		url = "https://" + url
 	}
-	_, err = db.DB.Exec("INSERT INTO banners (title, description, author, url, image, time_created) VALUES (?, ?, ?, ?, ?, ?)", strings.TrimSpace(title), strings.TrimSpace(description), author, strings.TrimSpace(url), img, time.Now().Format(time.DateTime))
+	_, err := db.DB.Exec("INSERT INTO banners (title, description, author, url, image, time_created) VALUES (?, ?, ?, ?, ?, ?)", strings.TrimSpace(title), strings.TrimSpace(description), author, strings.TrimSpace(url), img, time.Now().Format(time.DateTime))
 	if err != nil {
 		return fmt.Errorf("failed to create a new banner 2")
 	}
@@ -188,7 +204,7 @@ func (db *Database) NewBanner(title, description, author, url, img string) error
 }
 
 // Update the amount of uploaded banners.
-func (db *Database) UpdateGames() (int, error) {
+func (db *Database) UpdateBannerCount() (int, error) {
 	var count int
 	err := db.DB.QueryRow("SELECT COUNT(id) FROM banners").Scan(&count)
 	if err != nil {
@@ -217,4 +233,15 @@ func (db *Database) UpdateBannerSlice() ([]Banner, error) {
 		slice = append(slice, b)
 	}
 	return slice, nil
+}
+
+// Get the display name of a user by login.
+func (db *Database) GetDisplay(login string) (string, error) {
+	var display string
+
+	err := db.DB.QueryRow("SELECT display FROM users WHERE login = ?", login).Scan(&display)
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve display name from db")
+	}
+	return display, nil
 }

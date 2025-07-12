@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <title>{{ block "title" . }}Default Title{{ end }}</title>
+        <link rel="stylesheet" type="text/css" href="/static/css/base.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/built_in_classes.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {{ block "styles" . }}{{ end }}
+    </head>
+
+    <body>
+        <div class = 'v_div bck'>
+        <header>
+            <div class = 'header_content'>
+                <a class = 'HeaderBtn' href="/home">Game<b>S</b></a>
+                <div class = 'h_container Margin'>
+                    <a class = 'HeaderBtn' href="/home">Каталог</a>
+                    <a class = 'HeaderBtn' href="https://google.com">Библиотека</a>
+                    <a class = 'HeaderBtn' href="/newgame">Сообщество</a>
+                    <a class = 'HeaderBtn' href="/auth">Войти</a>
+                    {{ if .User }}
+                        <a style="color:yellow">Привет, {{ .User.Display }}!</a>
+                        <button id="logoutButton" style="color:darkred">Выйти</button>
+                    {{ else }}
+                        <a style="color: darkgray">Не авторизован</a>
+                    {{ end }}
+                </div>
+            </div>
+        </header>
+        
+        {{ block "content" . }}{{ end }}
+
+        <footer>
+            <h1>© 2022-2025 Shvap. All rights reserved.</h1>
+        </footer>
+        
+        <script type="text/javascript" src="/static/js/base.js"></script>
+        {{ block "scripts" . }}{{ end }}
+        </div>
+    </body>
+</html>
