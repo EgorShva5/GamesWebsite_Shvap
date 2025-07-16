@@ -44,6 +44,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 	}
 }
 
+// Check if user is authorized
 func EnsureAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if _, exists := ctx.Get("userData"); !exists {

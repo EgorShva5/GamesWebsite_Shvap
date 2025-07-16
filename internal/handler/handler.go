@@ -27,7 +27,7 @@ var BannerCount int
 var BannerSlice []store.Banner
 
 // Items per page.
-const PerPage = 3
+const PerPage = 9
 
 // Max page, that's it.
 var MaxPage uint64
@@ -52,7 +52,7 @@ type RegisterRequest struct {
 // Struct for login credentials.
 type LoginRequest struct {
 	Login    string `json:"login" binding:"required,min=2,max=32"`
-	Password string `json:"password" binding:"required,min=6,max=128"`
+	Password string `json:"password" binding:"required,min=6,max=64"`
 }
 
 // Data inside a JWT.

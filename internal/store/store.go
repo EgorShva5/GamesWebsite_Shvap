@@ -25,8 +25,7 @@ type Database struct {
 // Struct for config variables.
 type Config struct {
 	Keys struct {
-		PassHash string `yaml:"passhash"`
-		JWT      string `yaml:"jwt"`
+		JWT string `yaml:"jwt"`
 	} `yaml:"keys"`
 }
 
@@ -44,7 +43,7 @@ type Banner struct {
 	Author string `json:"author"` // login from jwt -> db -> author
 }
 
-// Variable to store keys.
+// Variable for storing keys.
 var Cfg = Config{}
 
 //
@@ -53,11 +52,8 @@ var Cfg = Config{}
 
 // Check if the keys are too short or too long.
 func (cfg *Config) Validate() error {
-	if tmp := len(cfg.Keys.PassHash); tmp < 6 || tmp > 128 {
-		return fmt.Errorf("the length of every key should be 6-128 characters (got %v for the PassHash key) hint: change them in config/config.yaml", tmp)
-	}
-	if tmp := len(cfg.Keys.JWT); tmp < 6 || tmp > 128 {
-		return fmt.Errorf("the length of every key should be 6-128 characters (got %v for the JWT key) hint: change them in config/config.yaml", tmp)
+	if tmp := len(cfg.Keys.JWT); tmp < 6 || tmp > 32 {
+		return fmt.Errorf("the length of JWT key must be 6-32 characters (got %v) hint: change it in config/config.yaml", tmp)
 	}
 	return nil
 }
@@ -145,8 +141,6 @@ func (db *Database) CheckUserExists(display, login string) error {
 
 // Register a new user.
 func (db *Database) Register(display, login string, password string) error {
-	password += Cfg.Keys.PassHash
-
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("failed to encrypt the password")
@@ -162,7 +156,6 @@ func (db *Database) Register(display, login string, password string) error {
 // Check user password. Return nil on success.
 func (db *Database) CheckPassword(login, password string) error {
 	var storedHash []byte
-	password += Cfg.Keys.PassHash
 
 	err := db.DB.QueryRow("SELECT password FROM users WHERE login = ?", login).Scan(&storedHash)
 	if err != nil {
@@ -193,7 +186,7 @@ func (db *Database) CheckBannerExists(title string) error {
 
 // Store a banner in the database.
 func (db *Database) NewBanner(title, description, author, url, img string) error {
-	if !strings.Contains(url, "http://") {
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 		url = "https://" + url
 	}
 	_, err := db.DB.Exec("INSERT INTO banners (title, description, author, url, image, time_created) VALUES (?, ?, ?, ?, ?, ?)", strings.TrimSpace(title), strings.TrimSpace(description), author, strings.TrimSpace(url), img, time.Now().Format(time.DateTime))
