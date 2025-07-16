@@ -25,7 +25,8 @@ func main() {
 	r.Static("/static", "./web/static")
 
 	r.GET("/", handler.RedirectHome)
-	r.GET("/home", handler.LoadHomePage)
+	r.GET("/catalog", handler.LoadHomePage)
+	r.GET("/home", handler.LoadMainPage)
 	r.GET("/auth", handler.LoadAuthPage)
 	r.GET("/newgame", middleware.EnsureAuth(), handler.LoadBannerCreationPage)
 

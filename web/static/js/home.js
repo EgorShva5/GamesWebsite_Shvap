@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
 );
 
 b1.onclick = function() {
-    window.location.href = window.location.origin + "/home?page=1"
+    window.location.href = window.location.origin + "/catalog?page=1"
 }
 b2.onclick = function() {
-    window.location.href = window.location.origin + "/home?page=" + (Page-1)
+    window.location.href = window.location.origin + "/catalog?page=" + (Page-1)
 }
 b4.onclick = function() {
-    window.location.href = window.location.origin + "/home?page=" + (Page+1)
+    window.location.href = window.location.origin + "/catalog?page=" + (Page+1)
 }
 b5.onclick = function() {
-    window.location.href = window.location.origin + "/home?page=" + MaxPage
+    window.location.href = window.location.origin + "/catalog?page=" + MaxPage
 }

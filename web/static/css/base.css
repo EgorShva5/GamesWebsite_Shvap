@@ -7,6 +7,11 @@
     min-height: 100vh;
 }
 
+.swiper {
+    width: 600px;
+    height: 300px;
+}
+
 .v_div.bck {
     background-image: linear-gradient(to top,#421952, #872341);
 }

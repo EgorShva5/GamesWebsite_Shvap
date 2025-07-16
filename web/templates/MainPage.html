@@ -1,0 +1,33 @@
+{{ template "Base.html" . }}
+
+{{ define "title" }}Домашняя страница{{ end }}
+
+{{ define "content" }}
+    <main>
+        <div>
+            <div style='max-height:400px; display: inline-flex; justify-content: center; max-width:100vh' class="swiper">
+                <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="/static/img/banners/a3d2f652-a8cd-43bc-b7d8-94880f3f347e.png"></div>
+                <div class="swiper-slide"><img src="/static/img/banners/a3d2f652-a8cd-43bc-b7d8-94880f3f347e.png"></div>
+                <div class="swiper-slide"><img src="/static/img/banners/a3d2f652-a8cd-43bc-b7d8-94880f3f347e.png"></div>
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+            
+            <script>
+                new Swiper('.swiper', {
+                autoplay: {
+                    delay: 5000,
+                    },
+                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                loop: true
+                });
+            </script>
+        </div>
+    </main>
+{{ end }}
+
+{{ define "scripts" }}
+    <script type="text/javascript" src="/static/js/auth.js"></script>
+{{ end }}

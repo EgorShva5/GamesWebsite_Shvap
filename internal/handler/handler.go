@@ -27,7 +27,7 @@ var BannerCount int
 var BannerSlice []store.Banner
 
 // Items per page.
-const PerPage = 9
+const PerPage = 4
 
 // Max page, that's it.
 var MaxPage uint64
@@ -101,6 +101,11 @@ func LoadAuthPage(ctx *gin.Context) {
 // Load banner creation page.
 func LoadBannerCreationPage(ctx *gin.Context) {
 	t.AutoRender(ctx, "NewBanner.html", nil)
+}
+
+// Load main page
+func LoadMainPage(ctx *gin.Context) {
+	t.AutoRender(ctx, "MainPage.html", nil)
 }
 
 // Retrieve all banners.

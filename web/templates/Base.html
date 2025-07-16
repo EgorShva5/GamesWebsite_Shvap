@@ -4,6 +4,12 @@
         <title>{{ block "title" . }}Default Title{{ end }}</title>
         <link rel="stylesheet" type="text/css" href="/static/css/base.css">
         <link rel="stylesheet" type="text/css" href="/static/css/built_in_classes.css">
+        <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+/>
+
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {{ block "styles" . }}{{ end }}
     </head>
@@ -14,8 +20,7 @@
             <div class = 'header_content'>
                 <a class = 'HeaderBtn' href="/home">Game<b>S</b></a>
                 <div class = 'h_container Margin'>
-                    <a class = 'HeaderBtn' href="/home">Каталог</a>
-                    <a class = 'HeaderBtn' href="https://google.com">Библиотека</a>
+                    <a class = 'HeaderBtn' href="/catalog">Каталог</a>
                     <a class = 'HeaderBtn' href="/newgame">Сообщество</a>
                     <a class = 'HeaderBtn' href="/auth">Войти</a>
                     {{ if .User }}
